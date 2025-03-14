@@ -1,0 +1,23 @@
+<mat-toolbar color="primary">
+  <!-- <button mat-icon-button *ngIf="true" (click)="sidenav.toggle()">
+    <mat-icon>menu</mat-icon>
+  </button> -->
+  <span class="app-title">Car Dealership Management</span>
+  <span class="spacer"></span>
+  <ng-container *ngIf="currentUser">
+    <button mat-button [matMenuTriggerFor]="userMenu">
+      <mat-icon>account_circle</mat-icon>
+      {{ currentUser.fullName }}
+    </button>
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item (click)="goToProfile()">
+        <mat-icon>person</mat-icon>
+        <span>Profile</span>
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
+  </ng-container>
+</mat-toolbar>

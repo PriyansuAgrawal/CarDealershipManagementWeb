@@ -1,0 +1,22 @@
+.layout-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.sidenav-container {
+  flex: 1;
+}
+
+.content {
+  padding: 20px;
+  min-height: calc(100vh - 64px - 50px); /* Subtract header and footer heights */
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  .content {
+    padding: 16px;
+    min-height: calc(100vh - 56px - 50px); /* Adjust for smaller header on mobile */
+  }
+}

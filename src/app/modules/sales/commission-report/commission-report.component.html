@@ -1,0 +1,199 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Salesman Commission Report</h1>
+    <!-- <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="exportToPdf()">
+        <mat-icon>picture_as_pdf</mat-icon> Export to PDF
+      </button>
+      <button mat-raised-button color="accent" (click)="exportToExcel()">
+        <mat-icon>description</mat-icon> Export to Excel
+      </button>
+    </div> -->
+  </div>
+
+  <mat-card>
+    <mat-card-content>
+      <form [formGroup]="filterForm" class="filter-container">
+        <mat-form-field appearance="outline">
+          <mat-label>Month</mat-label>
+          <mat-select formControlName="month">
+            <mat-option *ngFor="let month of months" [value]="month.value">
+              {{ month.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Year</mat-label>
+          <mat-select formControlName="year">
+            <mat-option *ngFor="let year of years" [value]="year">
+              {{ year }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="filter-actions">
+          <button mat-raised-button color="primary" (click)="generateReport()" [disabled]="isLoading">
+            <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+            <span *ngIf="!isLoading">Generate Report</span>
+          </button>
+          <button mat-button (click)="resetFilters()" [disabled]="isLoading">Reset</button>
+        </div>
+      </form>
+
+      <div *ngIf="!isLoading">
+        <mat-tab-group>
+          <mat-tab label="Commission Details">
+            <div class="table-container">
+              <table mat-table [dataSource]="detailsDataSource" class="mat-elevation-z8">
+                <!-- Salesman Column -->
+                <ng-container matColumnDef="salesmanName">
+                  <th mat-header-cell *matHeaderCellDef>Salesman</th>
+                  <td mat-cell *matCellDef="let element">{{ element.salesmanName }}</td>
+                  <td mat-footer-cell *matFooterCellDef><strong>Total</strong></td>
+                </ng-container>
+                <!-- Brand Column -->
+                <ng-container matColumnDef="brandName">
+                  <th mat-header-cell *matHeaderCellDef>Brand</th>
+                  <td mat-cell *matCellDef="let element">{{ element.brandName }}</td>
+                  <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+
+                <!-- Class Column -->
+                <ng-container matColumnDef="className">
+                  <th mat-header-cell *matHeaderCellDef>Class</th>
+                  <td mat-cell *matCellDef="let element">{{ element.className }}</td>
+                  <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+
+                <!-- Cars Sold Column -->
+                <ng-container matColumnDef="carsSold">
+                  <th mat-header-cell *matHeaderCellDef>Cars Sold</th>
+                  <td mat-cell *matCellDef="let element">{{ element.carsSold }}</td>
+                  <td mat-footer-cell *matFooterCellDef>{{ getTotalCarsSold() }}</td>
+                </ng-container>
+
+                <!-- Model Price Column -->
+                <ng-container matColumnDef="modelPrice">
+                  <th mat-header-cell *matHeaderCellDef>Model Price</th>
+                  <td mat-cell *matCellDef="let element">{{ element.modelPrice | currency }}</td>
+                  <td mat-footer-cell *matFooterCellDef></td>
+                </ng-container>
+
+                <!-- Total Sales Column -->
+                <ng-container matColumnDef="totalSales">
+                  <th mat-header-cell *matHeaderCellDef>Total Sales</th>
+                  <td mat-cell *matCellDef="let element">{{ element.totalSales | currency }}</td>
+                  <td mat-footer-cell *matFooterCellDef>{{ getTotalSales() | currency }}</td>
+                </ng-container>
+
+                <!-- Fixed Commission Column -->
+                <ng-container matColumnDef="fixedCommission">
+                  <th mat-header-cell *matHeaderCellDef>Fixed Commission</th>
+                  <td mat-cell *matCellDef="let element">{{ element.fixedCommission | currency }}</td>
+                  <td mat-footer-cell *matFooterCellDef>{{ getTotalFixedCommission() | currency }}</td>
+                </ng-container>
+
+                <!-- Class Commission Column -->
+                <ng-container matColumnDef="classCommission">
+                  <th mat-header-cell *matHeaderCellDef>Class Commission</th>
+                  <td mat-cell *matCellDef="let element">{{ element.classCommission | currency }}</td>
+                  <td mat-footer-cell *matFooterCellDef>{{ getTotalClassCommission() | currency }}</td>
+                </ng-container>
+
+                <!-- Bonus Commission Column -->
+                <ng-container matColumnDef="bonusCommission">
+                  <th mat-header-cell *matHeaderCellDef>Bonus Commission</th>
+                  <td mat-cell *matCellDef="let element">{{ element.bonusCommission | currency }}</td>
+                  <td mat-footer-cell *matFooterCellDef>{{ getTotalBonusCommission() | currency }}</td>
+                </ng-container>
+
+                <!-- Total Commission Column -->
+                <ng-container matColumnDef="totalCommission">
+                  <th mat-header-cell *matHeaderCellDef>Total Commission</th>
+                  <td mat-cell *matCellDef="let element">{{ element.totalCommission | currency }}</td>
+                  <td mat-footer-cell *matFooterCellDef>{{ getTotalCommission() | currency }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="detailsColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: detailsColumns;"></tr>
+                <tr mat-footer-row *matFooterRowDef="detailsColumns"></tr>
+
+                <tr class="mat-row" *matNoDataRow>
+                  <td class="mat-cell no-data-row" [attr.colspan]="detailsColumns.length">
+                    No commission data found for this period
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Summary by Salesman">
+            <div class="table-container">
+              <table mat-table [dataSource]="summaryDataSource" class="mat-elevation-z8">
+                <!-- Salesman Column -->
+                <ng-container matColumnDef="salesmanName">
+                  <th mat-header-cell *matHeaderCellDef>Salesman</th>
+                  <td mat-cell *matCellDef="let element">{{ element.salesmanName }}</td>
+                  <td mat-footer-cell *matFooterCellDef><strong>Total</strong></td>
+                </ng-container>
+
+                <!-- Total Cars Sold Column -->
+                <ng-container matColumnDef="totalCarsSold">
+                  <th mat-header-cell *matHeaderCellDef>Cars Sold</th>
+                  <td mat-cell *matCellDef="let element">{{ element.totalCarsSold }}</td>
+                  <td mat-footer-cell *matFooterCellDef>{{ getSummaryTotalCars() }}</td>
+                </ng-container>
+
+                <!-- Total Sales Amount Column -->
+                <ng-container matColumnDef="totalSalesAmount">
+                  <th mat-header-cell *matHeaderCellDef>Total Sales</th>
+                  <td mat-cell *matCellDef="let element">{{ element.totalSalesAmount | currency }}</td>
+                  <td mat-footer-cell *matFooterCellDef>{{ getSummaryTotalSales() | currency }}</td>
+                </ng-container>
+
+                <!-- Total Fixed Commission Column -->
+                <ng-container matColumnDef="totalFixedCommission">
+                  <th mat-header-cell *matHeaderCellDef>Fixed Commission</th>
+                  <td mat-cell *matCellDef="let element">{{ element.totalFixedCommission | currency }}</td>
+                  <td mat-footer-cell *matFooterCellDef>{{ getSummaryTotalFixedCommission() | currency }}</td>
+                </ng-container>
+
+                <!-- Total Class Commission Column -->
+                <ng-container matColumnDef="totalClassCommission">
+                  <th mat-header-cell *matHeaderCellDef>Class Commission</th>
+                  <td mat-cell *matCellDef="let element">{{ element.totalClassCommission | currency }}</td>
+                  <td mat-footer-cell *matFooterCellDef>{{ getSummaryTotalClassCommission() | currency }}</td>
+                </ng-container>
+
+                <!-- Total Bonus Commission Column -->
+                <ng-container matColumnDef="totalBonusCommission">
+                  <th mat-header-cell *matHeaderCellDef>Bonus Commission</th>
+                  <td mat-cell *matCellDef="let element">{{ element.totalBonusCommission | currency }}</td>
+                  <td mat-footer-cell *matFooterCellDef>{{ getSummaryTotalBonusCommission() | currency }}</td>
+                </ng-container>
+
+                <!-- Grand Total Commission Column -->
+                <ng-container matColumnDef="grandTotalCommission">
+                  <th mat-header-cell *matHeaderCellDef>Total Commission</th>
+                  <td mat-cell *matCellDef="let element">{{ element.grandTotalCommission | currency }}</td>
+                  <td mat-footer-cell *matFooterCellDef>{{ getSummaryTotalCommission() | currency }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="summaryColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: summaryColumns;"></tr>
+                <tr mat-footer-row *matFooterRowDef="summaryColumns"></tr>
+
+                <tr class="mat-row" *matNoDataRow>
+                  <td class="mat-cell no-data-row" [attr.colspan]="summaryColumns.length">
+                    No commission data found for this period
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

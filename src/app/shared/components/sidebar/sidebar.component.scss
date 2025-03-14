@@ -1,0 +1,31 @@
+.sidebar-container {
+  width: 250px;
+  height: 100%;
+}
+
+.mat-list-item.active {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.mat-expansion-panel {
+  border-radius: 0 !important;
+}
+
+.mat-expansion-panel-header {
+  padding: 0 16px;
+}
+
+.mat-panel-title {
+  display: flex;
+  align-items: center;
+}
+
+.mat-panel-title .mat-icon {
+  margin-right: 16px;
+}

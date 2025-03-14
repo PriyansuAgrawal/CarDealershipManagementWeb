@@ -1,0 +1,130 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Car Model Details</h1>
+    <div class="header-actions">
+      <button mat-raised-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to List
+      </button>
+      <button mat-raised-button color="primary" (click)="editCarModel()">
+        <mat-icon>edit</mat-icon>
+        Edit
+      </button>
+      <button mat-raised-button color="warn" (click)="deleteCarModel()">
+        <mat-icon>delete</mat-icon>
+        Delete
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <ng-container *ngIf="!isLoading && carModel">
+    <div class="detail-layout">
+      <div class="model-info">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>{{ carModel.modelName }}</mat-card-title>
+            <mat-card-subtitle>{{ carModel.modelCode }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">Brand</div>
+                <div class="info-value">{{ carModel.brandName }}</div>
+              </div>
+
+              <div class="info-item">
+                <div class="info-label">Class</div>
+                <div class="info-value">{{ carModel.className }}</div>
+              </div>
+
+              <div class="info-item">
+                <div class="info-label">Price</div>
+                <div class="info-value">{{ carModel.price | currency }}</div>
+              </div>
+
+              <div class="info-item">
+                <div class="info-label">Manufacturing Date</div>
+                <div class="info-value">{{ formatDate(carModel.dateOfManufacturing) }}</div>
+              </div>
+
+              <div class="info-item">
+                <div class="info-label">Status</div>
+                <div class="info-value">
+                  <span class="status-badge" [ngClass]="{'active': carModel.isActive, 'inactive': !carModel.isActive}">
+                    {{ carModel.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <div class="info-label">Sort Order</div>
+                <div class="info-value">{{ carModel.sortOrder }}</div>
+              </div>
+            </div>
+
+            <div class="description-section">
+              <h3>Description</h3>
+              <div class="rich-text-content" [innerHTML]="carModel.description"></div>
+            </div>
+
+            <div class="features-section">
+              <h3>Features</h3>
+              <div class="rich-text-content" [innerHTML]="carModel.features"></div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <div class="model-gallery">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>Images</mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="gallery-container" *ngIf="carModel.images?.length; else noImages">
+              <div class="main-image">
+                <img [src]="imageBaseUrl+carModel.images[currentImageIndex].imagePath" [alt]="carModel.modelName">
+
+                <div class="image-nav" *ngIf="carModel.images.length > 1">
+                  <button mat-mini-fab color="primary" (click)="prevImage()">
+                    <mat-icon>chevron_left</mat-icon>
+                  </button>
+                  <button mat-mini-fab color="primary" (click)="nextImage()">
+                    <mat-icon>chevron_right</mat-icon>
+                  </button>
+                </div>
+
+                <div class="default-indicator" *ngIf="carModel.images[currentImageIndex].isDefault">Default</div>
+              </div>
+
+              <div class="thumbnails" *ngIf="carModel.images.length > 1">
+                <div class="thumbnail"
+                     *ngFor="let image of carModel.images; let i = index"
+                     [class.active]="i === currentImageIndex"
+                     (click)="currentImageIndex = i">
+                  <img [src]="imageBaseUrl+image.imagePath" [alt]="carModel.modelName">
+                  <div class="default-mark" *ngIf="image.isDefault">
+                    <mat-icon>star</mat-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <ng-template #noImages>
+              <div class="no-images">
+                <mat-icon>image_not_supported</mat-icon>
+                <p>No images available for this car model</p>
+              </div>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </ng-container>
+</div>
